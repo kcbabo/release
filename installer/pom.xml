@@ -23,20 +23,20 @@
 
     <parent>
         <groupId>org.switchyard</groupId>
-        <artifactId>switchyard-as7-standalone-parent</artifactId>
+        <artifactId>switchyard-release</artifactId>
         <version>0.3.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>switchyard-as7-standalone-installer</artifactId>
+    <artifactId>switchyard-installer</artifactId>
     <packaging>pom</packaging>
-    <name>SwitchYard: AS7 Installer</name>
-    <description>SwitchYard AS7 Installer</description>
+    <name>SwitchYard: Installer</name>
+    <description>SwitchYard Installer</description>
 
     <properties>
         <bundle.dir>${project.build.directory}/bundle</bundle.dir>
-        <installer.root.dir>/switchyard-as7-installer-${version.distro}</installer.root.dir>
+        <installer.root.dir>/switchyard-installer-${version.distro}</installer.root.dir>
     </properties>
 
     <dependencies>
@@ -49,7 +49,7 @@
 
         <dependency> 
             <groupId>org.switchyard</groupId>
-            <artifactId>switchyard-forge-plugin</artifactId>
+            <artifactId>switchyard-forge-plugin-dist</artifactId>
             <type>zip</type> 
             <version>${project.version}</version>
             <scope>runtime</scope> 
@@ -81,24 +81,6 @@
                             <outputDirectory>${bundle.dir}</outputDirectory>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>copy-forge</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.switchyard</groupId>
-                                    <artifactId>switchyard-forge-plugin</artifactId>
-                                    <type>zip</type>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${bundle.dir}</outputDirectory>
-                        </configuration>
-		    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -112,7 +94,7 @@
                             <goal>attached</goal>
                         </goals>
                         <configuration>
-                            <finalName>SwitchYard-AS7-Installer</finalName>
+                            <finalName>switchyard-installer</finalName>
                             <descriptors>
                                 <descriptor>${basedir}/assembly.xml</descriptor>
                             </descriptors>

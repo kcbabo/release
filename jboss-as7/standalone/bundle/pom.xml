@@ -90,40 +90,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>install-switchyard-console</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.switchyard</groupId>
-                                    <artifactId>switchyard-console-gwt</artifactId>
-                                    <type>war</type>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <!--
-                                https://issues.jboss.org/browse/SWITCHYARD-548
-                                <artifactItem>
-                                    <groupId>org.switchyard</groupId>
-                                    <artifactId>switchyard-jbpm-gwt-console-server</artifactId>
-                                    <type>war</type>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.jbpm</groupId>
-                                    <artifactId>jbpm-gwt-console</artifactId>
-                                    <type>war</type>
-                                    <version>${version.jbpm}</version>
-                                </artifactItem>
-                                -->
-                            </artifactItems>
-                            <outputDirectory>${staging.jboss.dir}/standalone/deployments</outputDirectory>
-                            <stripVersion>true</stripVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>install-distribution-files</id>
                         <phase>generate-sources</phase>
                         <goals>
