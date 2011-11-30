@@ -35,23 +35,41 @@
           </not>
         </condition>
     </target>
+	
+	<target name="download-sy-tools-check">
+	    <condition property="sy.tools.not.available">
+	          <not>
+	            <available file="res/switchyard-tools.zip"/>
+	          </not>
+	        </condition>
+	</target>
+	
+	<target name="download-sy-tools" depends="download-sy-tools-check" if="sy.tools.not.available">
+	    <echo>Downloading SwitchYard Tools Bundle ..."</echo>
+	    <get src="${switchyard.tools.url}" dest="res/switchyard-tools.zip"/>
+	</target>
+	
+	<target name="extract-sy-tools" depends="download-sy-tools">
+		<unzip src="res/switchyard-tools.zip" dest="res/" overwrite="true">
+			  <mapper type="flatten"/>
+		</unzip>
+	</target>
 
     <target name="download-sy-as7" depends="download-sy-as7-check" if="sy.as7.not.available">
-        <echo>Downloading SwitchYard AS7 Bundle ..."</echo>
-        <get src="${as7.bundle.url}" dest="res/SwitchYard-AS7-Bundle.zip"/>	
+        <echo>Downloading SwitchYard AS7 Bundle ..."</echo>	
+        <get src="${as7.bundle.url}" dest="res/SwitchYard-AS7-Bundle.zip"/> 
     </target>
 
     <target name="download-sy-forge-module-check">
         <condition property="sy.forge.module.not.available">
             <not>
-              <available file="res/switchyard-forge-plugin.zip"/>
+              <available file="res/switchyard-forge-plugins.zip"/>
            </not>
         </condition>
     </target>
 
     <target name="download-sy-forge-module" depends="download-sy-forge-module-check" if="sy.forge.module.not.available">
-        <echo>Downloading SwitchYard Forge Module ..."</echo> 
-        <get src="${switchyard.forge.module.url}" dest="res/switchyard-forge-plugin.zip"/>
+        <antcall target="extract-sy-tools"/>
     </target>
 
     <target name="download-sy-console-check">
@@ -63,8 +81,7 @@
     </target>
 
     <target name="download-sy-console" depends="download-sy-console-check" if="sy.console.not.available">
-        <echo>Downloading SwitchYard Console ..."</echo>
-        <get src="${switchyard.console.url}" dest="res/switchyard-console-gwt.war"/>
+    	<antcall target="extract-sy-tools"/>
     </target>
 
     <target name="request-forge-install" unless="SKIP_FORGE">
@@ -76,7 +93,6 @@
               <equals arg1="${install.forge.question}" arg2="y" />
            </and>
         </condition>
-        <antcall target="download-sy-forge-module"/>
     </target>
 
     <target name="request-sy-console-install" unless="SKIP_CONSOLE">
@@ -88,8 +104,6 @@
               <equals arg1="${install.sy.console.question}" arg2="y" />
            </and>
         </condition>
-
-        <antcall target="download-sy-console"/>
     </target>
 
     <target name="get-jboss-path" unless="AS7_PATH">
@@ -126,7 +140,7 @@
 
     <target name="unzipSwitchyardResources" unless="switchyardResourcesAlreadyInstalled">
         <!-- Install into the AS7 install.... -->
-        <unzip src="${basedir}/SwitchYard-AS7-Bundle.zip" dest="${AS7_PATH}" overwrite="true">
+        <unzip src="res/SwitchYard-AS7-Bundle.zip" dest="${AS7_PATH}" overwrite="true">
             <patternset>
                 <include name="standalone/**" />
                 <include name="modules/**" />
@@ -147,7 +161,7 @@
 
     <target name="unzipQuickstartResources" unless="quickstartResourcesAlreadyInstalled">
         <!-- Install SwitchYard stuff into this directory.... -->
-        <unzip src="SwitchYard-AS7-Bundle.zip" dest="${QUICKSTART_PATH}" overwrite="true">
+        <unzip src="res/SwitchYard-AS7-Bundle.zip" dest="${QUICKSTART_PATH}" overwrite="true">
             <patternset>
                 <include name="quickstarts/**" />
             </patternset>
@@ -159,9 +173,9 @@
     </target>
 
     <target name="check-forge-home">
-	<property environment="env"/>
+    	<property environment="env"/>
         <condition property="forge.home.set">
-	   <isset property="env.FORGE_HOME"/>
+	       <isset property="env.FORGE_HOME"/>
         </condition>	
     </target>
 
@@ -183,10 +197,12 @@
     </target>
 
     <target name="install-sy-console" if="installSYConsole" depends="request-sy-console-install">
-	<copy todir="${AS7_PATH}/standalone/deployments" file="${basedir}/switchyard-console-gwt.war"/>
+        <antcall target="download-sy-console"/>
+    	<copy todir="${AS7_PATH}/standalone/deployments" file="res/switchyard-console-gwt.war"/>
     </target>
 
     <target name="install-forge" if="installForge" depends="request-forge-install">
+        <antcall target="download-sy-forge-module"/>
     	<antcall target="request-forge-home" />
     	<antcall target="set-forge-home" />
     	
@@ -194,13 +210,13 @@
             <available file="config" filepath="${user.home}/.forge" />
         </condition>
 
-        <fail unless="forge.plugindir.exists" message="Cannot find ${user.home}/forge/config.   Please run forge 1.0.0.beta3 before installing."/>
+        <fail unless="forge.plugindir.exists" message="Cannot find ${user.home}/.forge/config.   Please run forge 1.0.0.beta3 before installing."/>
 
         <echo>Creating switchyard directory...</echo>
         <mkdir dir="${user.home}/.forge/plugins/org/switchyard"/>
         <echo>Unzipping switchyard forge plugin module...</echo>
         <unzip dest="${user.home}/.forge/plugins/org/switchyard"
-                src="switchyard-forge-plugin.zip"/>
+                src="res/switchyard-forge-plugins.zip"/>
         <echo>Unzipped SwitchYard forge plugin.</echo>  
 
 	<echo>Installing forge plugin to ${user.home}/.forge ... </echo>
