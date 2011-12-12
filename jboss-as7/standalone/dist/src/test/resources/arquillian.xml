@@ -7,6 +7,7 @@
     <container qualifier="jboss7" default="true"> 
         <configuration>
 	        <property name="serverConfig">${switchyard.jboss.home}standalone/configuration/standalone-preview.xml</property>
+    	    <property name="startupTimeoutInSeconds">60</property>
         </configuration>
     </container>
 </arquillian>
