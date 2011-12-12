@@ -5,6 +5,9 @@
                          http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
 
     <container qualifier="jboss7" default="true"> 
+        <protocol type="jmx-as7">
+            <property name="executionType">REMOTE</property>
+        </protocol>
         <configuration>
 	        <property name="serverConfig">${switchyard.jboss.home}standalone/configuration/standalone-preview.xml</property>
     	    <property name="startupTimeoutInSeconds">60</property>
