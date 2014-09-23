@@ -32,6 +32,7 @@ import org.switchyard.as7.extension.SwitchYardExtension;
 import org.switchyard.as7.extension.SwitchYardModelConstants;
 import org.switchyard.as7.extension.admin.ModelNodeCreationUtil;
 import org.switchyard.as7.extension.camel.JBossThreadPoolFactory;
+import org.switchyard.as7.extension.camel.NamespaceContextProcessor;
 import org.switchyard.as7.extension.services.SwitchYardAdminService;
 import org.switchyard.common.camel.SwitchYardCamelContext;
 import org.switchyard.config.model.switchyard.SwitchYardModel;
@@ -113,6 +114,9 @@ public class SwitchYardDeployment {
                     _appServiceDomain.getProperty(SwitchYardCamelContext.CAMEL_CONTEXT_PROPERTY);
             camelCtx.getExecutorServiceManager().setThreadPoolFactory(
                     new JBossThreadPoolFactory(_contextSelector));
+            
+            // Configure the domain with a namespace context processor
+            new NamespaceContextProcessor(_contextSelector).setDomain(_appServiceDomain);
             
             List<Activator> activators = ActivatorLoader.createActivators(
                     _appServiceDomain, components, _deployment.getActivationTypes());
