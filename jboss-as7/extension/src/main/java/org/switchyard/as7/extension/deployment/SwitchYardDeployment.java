@@ -39,6 +39,7 @@ import org.switchyard.config.model.switchyard.SwitchYardModel;
 import org.switchyard.deploy.Activator;
 import org.switchyard.deploy.ActivatorLoader;
 import org.switchyard.deploy.Component;
+import org.switchyard.deploy.Lifecycle;
 import org.switchyard.deploy.ServiceDomainManager;
 import org.switchyard.deploy.internal.Deployment;
 
@@ -69,7 +70,7 @@ public class SwitchYardDeployment {
      */
     public SwitchYardDeployment(final DeploymentUnit deploymentUnit, final SwitchYardModel config, ServiceDomainManager domainManager) {
         _deployUnit = deploymentUnit;
-        _deployment = new Deployment(config);
+        _deployment = new ExtendedDeployment(config);
         _domainManager = domainManager;
     }
 
@@ -217,5 +218,56 @@ public class SwitchYardDeployment {
         _deployUnit.createDeploymentSubModel(SwitchYardExtension.SUBSYSTEM_NAME,
                 PathElement.pathElement(SwitchYardModelConstants.APPLICATION, applicationName.toString())).clear();
     }
+    
+    class ExtendedDeployment extends Deployment {
+        public ExtendedDeployment(SwitchYardModel configModel) {
+            super(configModel);
+        }
+        
+        @Override
+        public Lifecycle getGatwayLifecycle(final QName serviceName, final String bindingName) {
+            Lifecycle baseLifecycle = super.getGatwayLifecycle(serviceName, bindingName);
+            return new WrappedLifecycle(baseLifecycle);
+        }
+        
+    }
 
+    class WrappedLifecycle implements Lifecycle {
+        
+        private Lifecycle _delegate;
+        
+        WrappedLifecycle(Lifecycle delegate) {
+            _delegate = delegate;
+        }
+
+        @Override
+        public void start() {
+            try {
+                System.out.println("*** Setting namespace context in start() ***");
+                NamespaceContextSelector.pushCurrentSelector(_contextSelector);
+                _delegate.start();
+            } finally {
+                NamespaceContextSelector.popCurrentSelector();
+            }
+        }
+
+        @Override
+        public void stop() {
+            try {
+                System.out.println("*** Setting namespace context in stop() ***");
+                NamespaceContextSelector.pushCurrentSelector(_contextSelector);
+                _delegate.stop();
+            } finally {
+                NamespaceContextSelector.popCurrentSelector();
+            }
+        }
+
+        @Override
+        public State getState() {
+            return _delegate.getState();
+        }
+        
+    }
 }
+
+
